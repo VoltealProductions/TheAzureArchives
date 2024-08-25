@@ -18,8 +18,10 @@ func NewHandler(store types.CharacterStore) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(router *chi.Mux) {
-	router.Use(middleware.AuthMiddleware)
-	router.HandleFunc("POST /register", h.handleCreateCharacter)
+	router.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware)
+		r.HandleFunc("POST /create/character", h.handleCreateCharacter)
+	})
 }
 
 func (h *Handler) handleCreateCharacter(w http.ResponseWriter, r *http.Request) {
@@ -28,4 +30,6 @@ func (h *Handler) handleCreateCharacter(w http.ResponseWriter, r *http.Request) 
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
+
+	utils.WriteJSON(w, http.StatusOK, nil)
 }

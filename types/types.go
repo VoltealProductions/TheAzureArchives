@@ -73,10 +73,6 @@ type Character struct {
 }
 
 type CreateCharacterPayload struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Faction   string `json:"faction"`
-	Class     string `json:"class"`
 }
 
 type UpdateCharacterPayload struct {
