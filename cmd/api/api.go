@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/VoltealProductions/TheAzureArcchives/middleware"
+	"github.com/VoltealProductions/TheAzureArcchives/services/character"
 	"github.com/VoltealProductions/TheAzureArcchives/services/user"
 	"github.com/go-chi/chi/v5"
 )
@@ -33,6 +34,10 @@ func (s *APIServer) Run() error {
 	userStore := user.NewStore(s.db)
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(apiRouter)
+
+	characterStore := character.NewStore(s.db)
+	characterHandler := character.NewHandler(characterStore)
+	characterHandler.RegisterRoutes(apiRouter)
 
 	middlewareChain := MiddlewareChain(
 		middleware.RequestLoggerMiddleware,
