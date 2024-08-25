@@ -6,6 +6,8 @@ type UserStore interface {
 	GetUserByUsername(username string) (*User, error)
 	GetUserById(id int) (*User, error)
 	CreateUser(User) error
+	UpdateUser(userId int, user User) error
+	DeleteUser(userId int) error
 }
 
 type User struct {
@@ -23,6 +25,13 @@ type RegisterPayload struct {
 	Username string `json:"username" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=5,max=75"`
+	Public   bool   `json:"public"`
+}
+
+type UpdatePayload struct {
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password"`
 	Public   bool   `json:"public"`
 }
 

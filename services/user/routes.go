@@ -2,8 +2,8 @@ package user
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/VoltealProductions/TheAzureArcchives/config"
 	"github.com/VoltealProductions/TheAzureArcchives/services/auth"
@@ -24,6 +24,8 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoutes(router *chi.Mux) {
 	router.HandleFunc("POST /register", h.handleRegister)
 	router.HandleFunc("POST /login", h.handleLogin)
+	router.HandleFunc("PUT /user/update/{userId}", h.handleUpdateUser)
+	router.HandleFunc("DELETE /user/delete/{userId}", h.handleDeleteUser)
 	router.HandleFunc("POST /logout", h.handleLogin)
 }
 
@@ -42,13 +44,11 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.store.GetUserByUsername(payload.Username)
 	if err != nil {
-		log.Println("FAILURE GETTING USER")
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("incorrect username or password"))
 		return
 	}
 
 	if !auth.CompareHashedPasswords([]byte(u.Password), []byte(payload.Password)) {
-		log.Println("FAILURE COMPARINS HASHES")
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("incorrect username or password"))
 		return
 	}
@@ -97,4 +97,71 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, nil)
+}
+
+func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "userId")
+	var payload types.UpdatePayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	id, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("unable to parse user ID: %v", err))
+		return
+	}
+
+	u, err := h.store.GetUserById(int(id))
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("a user with id: %s does not exist", payload.Username))
+		return
+	}
+
+	var pwd string
+	if payload.Password == "" {
+		pwd = u.Password
+	} else {
+		pwd, err = auth.HashPassword(payload.Password)
+		if err != nil {
+			utils.WriteError(w, http.StatusBadRequest, err)
+		}
+	}
+
+	err = h.store.UpdateUser(int(id), types.User{
+		Username: payload.Username,
+		Password: pwd,
+		Email:    payload.Email,
+		Public:   payload.Public,
+	})
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, nil)
+}
+
+func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "userId")
+	id, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("unable to parse user ID: %v", err))
+		return
+	}
+
+	err = h.store.DeleteUser(int(id))
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, nil)
 }

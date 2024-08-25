@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/VoltealProductions/TheAzureArcchives/types"
 )
@@ -57,7 +58,7 @@ func scanRowIntoUser(rows *sql.Rows) (*types.User, error) {
 }
 
 func (s *Store) GetUserById(id int) (*types.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users WHERE id = ?", id)
+	rows, err := s.db.Query("SELECT * FROM users WHERE id = ? LIMIT 1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,32 @@ func (s *Store) GetUserById(id int) (*types.User, error) {
 }
 
 func (s *Store) CreateUser(user types.User) error {
-	_, err := s.db.Exec("INSERT INTO users (username, email, password, public) VALUES (?, ?, ?, ?)", user.Username, user.Email, user.Password, user.Public)
+	_, err := s.db.Exec("INSERT INTO users (username, email, password, public) VALUES (?, ?, ?, ?)", strings.ToLower(user.Username), user.Email, user.Password, user.Public)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) UpdateUser(userId int, user types.User) error {
+
+	_, err := s.db.Exec(
+		"UPDATE users SET username = ?, password = ?, email = ?, public = ? WHERE id = ?",
+		strings.ToLower(user.Username), user.Password, user.Email, user.Public, userId,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteUser(userId int) error {
+	_, err := s.db.Exec(
+		"DELETE FROM users WHERE id = ?",
+		userId,
+	)
 	if err != nil {
 		return err
 	}
