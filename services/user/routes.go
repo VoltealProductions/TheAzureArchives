@@ -47,8 +47,6 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Password in DB: ", u.Email)
-
 	if !auth.CompareHashedPasswords([]byte(u.Password), []byte(payload.Password)) {
 		log.Println("FAILURE COMPARINS HASHES")
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("incorrect username or password"))
