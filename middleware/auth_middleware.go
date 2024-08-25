@@ -4,8 +4,8 @@ import (
 	"net/http"
 )
 
-func AuthMiddleware(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		if token != "Bearer token" {
 			http.Error(w, "Unathorized", http.StatusUnauthorized)
@@ -13,5 +13,5 @@ func AuthMiddleware(next http.Handler) http.HandlerFunc {
 		}
 
 		next.ServeHTTP(w, r)
-	}
+	})
 }

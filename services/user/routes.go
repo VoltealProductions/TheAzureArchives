@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/VoltealProductions/TheAzureArcchives/config"
+	"github.com/VoltealProductions/TheAzureArcchives/middleware"
 	"github.com/VoltealProductions/TheAzureArcchives/services/auth"
 	"github.com/VoltealProductions/TheAzureArcchives/types"
 	"github.com/VoltealProductions/TheAzureArcchives/utils"
@@ -24,9 +25,12 @@ func NewHandler(store types.UserStore) *Handler {
 func (h *Handler) RegisterRoutes(router *chi.Mux) {
 	router.HandleFunc("POST /register", h.handleRegister)
 	router.HandleFunc("POST /login", h.handleLogin)
-	router.HandleFunc("PUT /user/update/{userId}", h.handleUpdateUser)
-	router.HandleFunc("DELETE /user/delete/{userId}", h.handleDeleteUser)
-	router.HandleFunc("POST /logout", h.handleLogin)
+	router.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware)
+		r.HandleFunc("PUT /user/update/{userId}", h.handleUpdateUser)
+		r.HandleFunc("DELETE /user/delete/{userId}", h.handleDeleteUser)
+		r.HandleFunc("POST /logout", h.handleLogin)
+	})
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
