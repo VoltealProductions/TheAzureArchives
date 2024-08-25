@@ -2,11 +2,12 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/VoltealProductions/TheAzureArcchives/middleware"
+	"github.com/VoltealProductions/TheAzureArcchives/services/user"
+	"github.com/go-chi/chi/v5"
 )
 
 type APIServer struct {
@@ -24,14 +25,14 @@ func NewApiServer(addr string, db *sql.DB) *APIServer {
 }
 
 func (s *APIServer) Run() error {
-	router := http.NewServeMux()
-	router.HandleFunc("GET /hello/{userName}", func(w http.ResponseWriter, r *http.Request) {
-		userName := r.PathValue("userName")
-		fmt.Println("Hello,", userName, "!")
-	})
+	router := chi.NewRouter()
 
-	v1 := http.NewServeMux()
-	v1.Handle("/api/v1", http.StripPrefix("/api/v1", router))
+	apiRouter := chi.NewRouter()
+	router.Mount("/api/v1", apiRouter)
+
+	userStore := user.NewStore(s.db)
+	userHandler := user.NewHandler(userStore)
+	userHandler.RegisterRoutes(apiRouter)
 
 	middlewareChain := MiddlewareChain(
 		middleware.RequestLoggerMiddleware,
