@@ -1,6 +1,7 @@
 package types
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -43,36 +44,35 @@ type LoginPayload struct {
 }
 
 type CharacterStore interface {
-	// GetCharacterByName(name string) (*Character, error)
-	// GetCharacterById(id int) (*Character, error)
+	// GetCharactersByUserId(id int) (*Character, error)
+	GetCharacterByUniqueId(urlId string) (*Character, error)
 	CreateCharacter(Character) error
 	// UpdateCharacter(id int, user Character) error
 	// DeleteCharacter(id int) error
 }
 
 type Character struct {
-	ID         int64     `json:"id"`
-	UserID     int64     `json:"user_id"`
-	UniqueId   string    `json:"unique_id_number"`
-	Firstname  string    `json:"firstname"`
-	Lastname   string    `json:"lastname"`
-	Slug       string    `json:"slug"`
-	Faction    string    `json:"faction"`
-	Class      string    `json:"class"`
-	ShortTitle string    `json:"short_title"`
-	FullTitle  string    `json:"full_title"`
-	Age        int32     `json:"age"`
-	Gender     string    `json:"gender"`
-	Pronouns   string    `json:"pronouns"`
-	Height     float32   `json:"height"`
-	Weight     float32   `json:"weight"`
-	Species    string    `json:"species"`
-	Birthplace string    `json:"birthplace"`
-	Residence  string    `json:"residence"`
-	About      string    `json:"about"`
-	History    string    `json:"history"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID         int64           `json:"id"`
+	UserID     int64           `json:"user_id"`
+	UniqueId   string          `json:"unique_id_number"`
+	Firstname  string          `json:"firstname"`
+	Lastname   string          `json:"lastname"`
+	Faction    string          `json:"faction"`
+	Species    string          `json:"species"`
+	Class      string          `json:"class"`
+	ShortTitle sql.NullString  `json:"short_title"`
+	FullTitle  sql.NullString  `json:"full_title"`
+	Age        sql.NullInt64   `json:"age"`
+	Gender     sql.NullString  `json:"gender"`
+	Pronouns   sql.NullString  `json:"pronouns"`
+	Height     sql.NullFloat64 `json:"height"`
+	Weight     sql.NullFloat64 `json:"weight"`
+	Birthplace sql.NullString  `json:"birthplace"`
+	Residence  sql.NullString  `json:"residence"`
+	About      sql.NullString  `json:"about"`
+	History    sql.NullString  `json:"history"`
+	CreatedAt  time.Time       `json:"created_at"`
+	UpdatedAt  time.Time       `json:"updated_at"`
 }
 
 type CreateCharacterPayload struct {

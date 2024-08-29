@@ -23,6 +23,7 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 	router.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware)
 		r.HandleFunc("POST /create/character", h.handleCreateCharacter)
+		r.HandleFunc("GET /character/show/{id}", h.HandleGetCharacter)
 	})
 }
 
@@ -54,4 +55,17 @@ func (h *Handler) handleCreateCharacter(w http.ResponseWriter, r *http.Request) 
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, nil)
+}
+
+func (h *Handler) HandleGetCharacter(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	fmt.Println(id)
+
+	c, err := h.store.GetCharacterByUniqueId(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, c)
 }
