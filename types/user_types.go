@@ -19,6 +19,7 @@ type User struct {
 	Banned    bool      `json:"banned"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Badges    string    `json:"badges"`
 }
 
 type RegisterPayload struct {
@@ -26,6 +27,7 @@ type RegisterPayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=5,max=75"`
 	Public   bool   `json:"public"`
+	Badges   string `json:"badges"`
 }
 
 type UpdatePayload struct {
@@ -33,6 +35,7 @@ type UpdatePayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password"`
 	Public   bool   `json:"public"`
+	Badges   string `json:"badges"`
 }
 
 type LoginPayload struct {
