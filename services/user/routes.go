@@ -178,5 +178,8 @@ func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, nil)
+	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
