@@ -1,6 +1,11 @@
 package guild
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/VoltealProductions/TheAzureArcchives/types"
+)
 
 type Store struct {
 	db *sql.DB
@@ -8,4 +13,72 @@ type Store struct {
 
 func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
+}
+
+func (s *Store) GetGuildBySlug(slug string) (*types.Guild, error) {
+	rows, err := s.db.Query("SELECT * FROM guilds WHERE slug = ?", slug)
+	if err != nil {
+		return nil, err
+	}
+
+	g := new(types.Guild)
+	for rows.Next() {
+		g, err = scanRowIntoGuild(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if g.ID == 0 {
+		return nil, fmt.Errorf("guild not found")
+	}
+
+	return g, nil
+}
+
+func scanRowIntoGuild(rows *sql.Rows) (*types.Guild, error) {
+	guild := new(types.Guild)
+
+	err := rows.Scan(
+		&guild.ID,
+		&guild.OwnerId,
+		&guild.Slug,
+		&guild.Name,
+		&guild.Faction,
+		&guild.Realm,
+		&guild.Ranks,
+		&guild.Recruiting,
+		&guild.Description,
+		&guild.CreatedAt,
+		&guild.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return guild, nil
+}
+
+func (s *Store) CreateGuild(guild types.Guild) error {
+	_, err := s.db.Exec(
+		"INSERT INTO guilds (owner_id, slug, name, faction, realm, recruiting, description) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		guild.OwnerId, guild.Slug, guild.Name, guild.Faction, guild.Realm, guild.Recruiting, guild.Description,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteGuild(guildId int) error {
+	_, err := s.db.Exec(
+		"DELETE FROM guilds WHERE id = ?",
+		guildId,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
