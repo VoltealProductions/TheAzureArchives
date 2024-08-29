@@ -5,10 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/VoltealProductions/TheAzureArcchives/middleware"
 	"github.com/VoltealProductions/TheAzureArcchives/services/character"
 	"github.com/VoltealProductions/TheAzureArcchives/services/user"
 	"github.com/go-chi/chi/v5"
+	chimw "github.com/go-chi/chi/v5/middleware"
 )
 
 type APIServer struct {
@@ -27,6 +27,7 @@ func NewApiServer(addr string, db *sql.DB) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := chi.NewRouter()
+	router.Use(chimw.Logger)
 
 	apiRouter := chi.NewRouter()
 	router.Mount("/api/v1", apiRouter)
@@ -39,13 +40,9 @@ func (s *APIServer) Run() error {
 	characterHandler := character.NewHandler(characterStore)
 	characterHandler.RegisterRoutes(apiRouter)
 
-	middlewareChain := MiddlewareChain(
-		middleware.RequestLoggerMiddleware,
-	)
-
 	server := http.Server{
 		Addr:    s.addr,
-		Handler: middlewareChain(router),
+		Handler: router,
 	}
 
 	log.Println("The azure archives is listening on", s.addr)
