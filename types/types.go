@@ -44,8 +44,8 @@ type LoginPayload struct {
 }
 
 type CharacterStore interface {
-	// GetCharactersByUserId(id int) (*Character, error)
 	GetCharacterByUniqueId(urlId string) (*Character, error)
+	GetCharacterByUserId(id int) ([]Character, error)
 	CreateCharacter(Character) error
 	// UpdateCharacter(id int, user Character) error
 	// DeleteCharacter(id int) error

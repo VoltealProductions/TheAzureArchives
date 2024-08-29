@@ -3,6 +3,7 @@ package character
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/VoltealProductions/TheAzureArcchives/middleware"
 	"github.com/VoltealProductions/TheAzureArcchives/types"
@@ -24,6 +25,7 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 		r.Use(middleware.AuthMiddleware)
 		r.HandleFunc("POST /create/character", h.handleCreateCharacter)
 		r.HandleFunc("GET /character/show/{id}", h.HandleGetCharacter)
+		r.HandleFunc("GET /user/{id}/characters", h.HandleGetCharacterByUserId)
 	})
 }
 
@@ -59,9 +61,25 @@ func (h *Handler) handleCreateCharacter(w http.ResponseWriter, r *http.Request) 
 
 func (h *Handler) HandleGetCharacter(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	fmt.Println(id)
 
 	c, err := h.store.GetCharacterByUniqueId(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, c)
+}
+
+func (h *Handler) HandleGetCharacterByUserId(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	c, err := h.store.GetCharacterByUserId(uid)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return

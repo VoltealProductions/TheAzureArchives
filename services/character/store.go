@@ -43,6 +43,24 @@ func (s *Store) GetCharacterByUniqueId(id string) (*types.Character, error) {
 	return c, nil
 }
 
+func (s *Store) GetCharacterByUserId(id int) ([]types.Character, error) {
+	rows, err := s.db.Query("SELECT * FROM characters WHERE user_id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+
+	chars := []types.Character{}
+	for rows.Next() {
+		char, err := scanRowIntoCharacter(rows)
+		chars = append(chars, *char)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return chars, nil
+}
+
 func scanRowIntoCharacter(rows *sql.Rows) (*types.Character, error) {
 	char := new(types.Character)
 
