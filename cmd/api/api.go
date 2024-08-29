@@ -40,6 +40,10 @@ func (s *APIServer) Run() error {
 	characterHandler := character.NewHandler(characterStore)
 	characterHandler.RegisterRoutes(apiRouter)
 
+	// guildStore := guild.NewStore(s.db)
+	// guildHandler := guild.NewHandler(guildStore)
+	// guildHandler.RegisterRoutes(apiRouter)
+
 	server := http.Server{
 		Addr:    s.addr,
 		Handler: router,
