@@ -1,11 +1,12 @@
 CREATE TABLE IF NOT EXISTS characters (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `unique_id_number` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
+    `unique_id` VARCHAR(25) NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `faction` VARCHAR(255) NOT NULL,
+    `class` VARCHAR(255) NOT NULL,
     `species` VARCHAR(255) NOT NULL,
-    `slug` VARCHAR(255) NOT NULL,
     `short_title` VARCHAR(255) DEFAULT NULL,
     `full_title` VARCHAR(255) DEFAULT NULL,
     `age` INT UNSIGNED DEFAULT NULL,
@@ -20,6 +21,6 @@ CREATE TABLE IF NOT EXISTS characters (
     `created_at` TIMESTAMP DEFAULT NOW(),
     `updated_at` TIMESTAMP DEFAULT NOW(),
     PRIMARY KEY (id),
-    UNIQUE KEY (unique_id_number),
-    UNIQUE KEY (slug)
+    UNIQUE KEY (unique_id),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -15,5 +15,13 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) CreateCharacter(char types.Character) error {
+	_, err := s.db.Exec(
+		"INSERT INTO characters (user_id, unique_id, firstname, lastname, faction, species, class) VALUES (?, ?, ?, ?, ?, ?, ?)",
+		char.UserID, char.UniqueId, char.Firstname, char.Lastname, char.Faction, char.Species, char.Class,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -3,9 +3,11 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"math/rand"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/sqids/sqids-go"
 )
 
 var Validate = validator.New()
@@ -27,4 +29,14 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 
 func WriteError(w http.ResponseWriter, status int, err error) {
 	WriteJSON(w, status, map[string]string{"error": err.Error()})
+}
+
+func GenerateURLId() string {
+	s, _ := sqids.New()
+	id, _ := s.Encode([]uint64{randomNumber(), randomNumber(), randomNumber()})
+	return id
+}
+
+func randomNumber() uint64 {
+	return uint64(rand.Intn(9999))
 }
