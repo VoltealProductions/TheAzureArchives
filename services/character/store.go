@@ -60,6 +60,19 @@ func (s *Store) GetCharacterByUserId(id int) ([]types.Character, error) {
 
 	return chars, nil
 }
+
+func (s *Store) UpdateCharacter(id int, char types.Character) error {
+	_, err := s.db.Exec(
+		"UPDATE characters SET firstname = ?, lastname = ?, faction = ?, class = ?, species = ?, short_title = ?, full_title = ?, age = ?, gender = ?, pronouns = ?, height = ?, weight = ?, birthplace = ?, residence = ?, about = ?, history = ? WHERE id = ?",
+		char.Firstname, char.Lastname, char.Faction, char.Class, char.Species, char.ShortTitle, char.FullTitle, char.Age, char.Gender, char.Pronouns, char.Height, char.Weight, char.Birthplace, char.Residence, char.About, char.History, id,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Store) DeleteCharacter(id int) error {
 	_, err := s.db.Exec(
 		"DELETE FROM characters WHERE id = ?",

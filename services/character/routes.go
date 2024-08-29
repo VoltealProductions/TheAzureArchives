@@ -26,6 +26,7 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 		r.HandleFunc("POST /create/character", h.handleCreateCharacter)
 		r.HandleFunc("GET /character/show/{id}", h.HandleGetCharacter)
 		r.HandleFunc("GET /user/{id}/characters", h.HandleGetCharacterByUserId)
+		r.HandleFunc("PUT /character/update/{id}", h.handleUpdateCharacter)
 		r.HandleFunc("DELETE /character/delete/{id}", h.handleDeleteUser)
 	})
 }
@@ -87,6 +88,52 @@ func (h *Handler) HandleGetCharacterByUserId(w http.ResponseWriter, r *http.Requ
 	}
 
 	utils.WriteJSON(w, http.StatusOK, c)
+}
+
+func (h *Handler) handleUpdateCharacter(w http.ResponseWriter, r *http.Request) {
+	charID := chi.URLParam(r, "id")
+	var payload types.UpdateCharacterPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	id, err := strconv.ParseInt(charID, 10, 64)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("unable to parse user ID: %v", err))
+		return
+	}
+
+	err = h.store.UpdateCharacter(int(id), types.Character{
+		Firstname:  payload.Firstname,
+		Lastname:   payload.Lastname,
+		Faction:    payload.Faction,
+		Class:      payload.Class,
+		Species:    payload.Species,
+		ShortTitle: payload.ShortTitle,
+		FullTitle:  payload.FullTitle,
+		Age:        payload.Age,
+		Gender:     payload.Gender,
+		Pronouns:   payload.Pronouns,
+		Height:     payload.Height,
+		Weight:     payload.Weight,
+		Birthplace: payload.Birthplace,
+		Residence:  payload.Residence,
+		About:      payload.About,
+		History:    payload.History,
+	})
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, nil)
 }
 
 func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
