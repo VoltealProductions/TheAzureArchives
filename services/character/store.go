@@ -60,6 +60,17 @@ func (s *Store) GetCharacterByUserId(id int) ([]types.Character, error) {
 
 	return chars, nil
 }
+func (s *Store) DeleteCharacter(id int) error {
+	_, err := s.db.Exec(
+		"DELETE FROM characters WHERE id = ?",
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func scanRowIntoCharacter(rows *sql.Rows) (*types.Character, error) {
 	char := new(types.Character)
