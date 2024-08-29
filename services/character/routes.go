@@ -2,6 +2,7 @@ package character
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -58,7 +59,10 @@ func (h *Handler) handleCreateCharacter(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	err = utils.WriteJSON(w, http.StatusCreated, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) HandleGetCharacter(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +74,10 @@ func (h *Handler) HandleGetCharacter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, c)
+	err = utils.WriteJSON(w, http.StatusOK, c)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) HandleGetCharacterByUserId(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +94,10 @@ func (h *Handler) HandleGetCharacterByUserId(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, c)
+	err = utils.WriteJSON(w, http.StatusOK, c)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) handleUpdateCharacter(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +143,10 @@ func (h *Handler) handleUpdateCharacter(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, nil)
+	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -150,5 +163,8 @@ func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, nil)
+	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -63,7 +64,10 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 	}
 
-	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
+	err = utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +105,10 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	err = utils.WriteJSON(w, http.StatusCreated, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +158,10 @@ func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, nil)
+	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {

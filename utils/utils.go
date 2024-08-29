@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"math/rand"
 	"net/http"
 
@@ -27,8 +28,11 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	return json.NewEncoder(w).Encode(v)
 }
 
-func WriteError(w http.ResponseWriter, status int, err error) {
-	WriteJSON(w, status, map[string]string{"error": err.Error()})
+func WriteError(w http.ResponseWriter, status int, errs error) {
+	err := WriteJSON(w, status, map[string]string{"error": errs.Error()})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func GenerateURLId() string {
