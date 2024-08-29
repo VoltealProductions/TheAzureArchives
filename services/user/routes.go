@@ -49,7 +49,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	u, err := h.store.GetUserByUsername(payload.Username)
 	if err != nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("incorrect username or password"))
+		utils.WriteError(w, http.StatusBadRequest, err)
 		return
 	}
 

@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type UserStore interface {
 	GetUserByUsername(username string) (*User, error)
@@ -11,15 +14,15 @@ type UserStore interface {
 }
 
 type User struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Public    bool      `json:"public"`
-	Banned    bool      `json:"banned"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Badges    string    `json:"badges"`
+	ID        int64          `json:"id"`
+	Username  string         `json:"username"`
+	Email     string         `json:"email"`
+	Password  string         `json:"password"`
+	Public    bool           `json:"public"`
+	Banned    bool           `json:"banned"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	Badges    sql.NullString `json:"badges"`
 }
 
 type RegisterPayload struct {
