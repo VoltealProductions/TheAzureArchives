@@ -18,7 +18,10 @@ func NewStore(db *sql.DB) *Store {
 
 func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 	var nui sql.Null[string]
-	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ?", slug).Scan(&nui)
+	err := s.db.QueryRow("SELECT id FROM guilds WHERE slug = ?", slug).Scan(&nui)
+	if err != nil {
+		return false, err
+	}
 
 	if nui.Valid {
 		return true, nil
@@ -29,7 +32,10 @@ func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 
 func (s *Store) ConfirmThatUserOwnsGuild(slug string, id uint) (bool, error) {
 	var nui sql.Null[string]
-	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ? AND owner_id = ?", slug, id).Scan(&nui)
+	err := s.db.QueryRow("SELECT id FROM guilds WHERE slug = ? AND owner_id = ?", slug, id).Scan(&nui)
+	if err != nil {
+		return false, err
+	}
 
 	if nui.Valid {
 		return true, nil
