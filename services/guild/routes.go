@@ -82,6 +82,18 @@ func (h *Handler) handleCreateGuild(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) handleUpdatGuild(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
+
+	exists, err := h.store.ConfirmThatGuildExists(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !exists {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("no guild with slug %s exists", slug))
+		return
+	}
+
 	var payload types.UpdateGuildPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
@@ -94,7 +106,7 @@ func (h *Handler) handleUpdatGuild(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.store.UpdateGuild(slug, types.Guild{
+	err = h.store.UpdateGuild(slug, types.Guild{
 		Name:        payload.Name,
 		Slug:        slg.Make(fmt.Sprintf("%s %s", payload.Name, payload.Realm)),
 		Faction:     payload.Faction,
@@ -118,7 +130,18 @@ func (h *Handler) handleUpdatGuild(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleDeleteGuild(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
-	err := h.store.DeleteGuild(slug)
+	exists, err := h.store.ConfirmThatGuildExists(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !exists {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("no guild with slug %s exists", slug))
+		return
+	}
+
+	err = h.store.DeleteGuild(slug)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return

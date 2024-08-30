@@ -15,6 +15,19 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 
+func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
+	var nui sql.Null[string]
+	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ?", slug).Scan(&nui)
+
+	fmt.Println(nui.Valid)
+
+	if nui.Valid {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (s *Store) GetGuildBySlug(slug string) (*types.Guild, error) {
 	rows, err := s.db.Query("SELECT * FROM guilds WHERE slug = ?", slug)
 	if err != nil {

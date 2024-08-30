@@ -6,8 +6,8 @@ import (
 
 type GuildStore interface {
 	GetGuildBySlug(slug string) (*Guild, error)
-	// GetGuildByUserId(id int) ([]Guild, error)
 	CreateGuild(Guild) error
+	ConfirmThatGuildExists(slug string) (bool, error)
 	UpdateGuild(slug string, guild Guild) error
 	DeleteGuild(slug string) error
 }
