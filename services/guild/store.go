@@ -188,8 +188,6 @@ func (s *Store) retrieveCharacters(rows *sql.Rows) *types.Character {
 		log.Fatal(err)
 	}
 
-	fmt.Println(id.CharacterID)
-
 	characterRows, err := s.db.Query("SELECT * FROM characters WHERE id = ?", id.CharacterID)
 	if err != nil {
 		log.Fatal(err)
