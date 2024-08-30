@@ -155,3 +155,11 @@ func (s *Store) TransferGuild(slug string, id uint, guild types.Guild) error {
 
 	return nil
 }
+
+func (s *Store) GetAllGuildMembers(slug string) ([]types.GuildMember, error) {
+	return nil, nil
+}
+
+// func (s *Store) retrieveGuildMember(slug string, id uint, guild types.Guild) (types.GuildMember, error) {
+// 	return nil, nil
+// }

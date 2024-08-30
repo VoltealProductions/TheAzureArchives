@@ -7,6 +7,7 @@ import (
 type GuildStore interface {
 	GetGuildBySlug(slug string) (*Guild, error)
 	GetGuildsByUserId(id int) ([]Guild, error)
+	GetAllGuildMembers(slug string) ([]GuildMember, error)
 	CreateGuild(Guild) error
 	ConfirmThatGuildExists(slug string) (bool, error)
 	ConfirmThatUserOwnsGuild(slug string, id uint) (bool, error)
@@ -25,6 +26,15 @@ type Guild struct {
 	Ranks       string    `json:"ranks"`
 	Recruiting  bool      `json:"recruiting"`
 	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type GuildMember struct {
+	ID          uint      `json:"id"`
+	GuildID     uint      `json:"guild_id"`
+	CharacterID uint      `json:"character_id"`
+	Rank        string    `json:"rank"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
