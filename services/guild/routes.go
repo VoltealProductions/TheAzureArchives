@@ -30,7 +30,8 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 		// r.HandleFunc("GET /guild/{slug}/members", h.handleGetGuild)
 		r.HandleFunc("GET /user/{id}/guilds", h.HandleGetCharacterByUserId)
 		r.HandleFunc("POST /guild/create", h.handleCreateGuild)
-		r.HandleFunc("POST /guild/{slug}/update", h.handleUpdatGuild)
+		r.HandleFunc("PUT /guild/{slug}/update", h.handleUpdatGuild)
+		r.HandleFunc("PUT /guild/{slug}/transfer-ownership", h.handleTransferGuildOwnerShip)
 		r.HandleFunc("DELETE /guild/{slug}/delete", h.handleDeleteGuild)
 	})
 }
@@ -165,6 +166,57 @@ func (h *Handler) handleDeleteGuild(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.store.DeleteGuild(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (h *Handler) handleTransferGuildOwnerShip(w http.ResponseWriter, r *http.Request) {
+	slug := chi.URLParam(r, "slug")
+
+	var payload types.TransferGuildPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	exists, err := h.store.ConfirmThatGuildExists(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !exists {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("no guild with slug %s exists", slug))
+		return
+	}
+
+	owns, err := h.store.ConfirmThatUserOwnsGuild(slug, payload.CurrentOwnerId)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !owns {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("you do not own this guild: %s", slug))
+		return
+	}
+
+	err = h.store.TransferGuild(slug, payload.CurrentOwnerId, types.Guild{
+		OwnerId: payload.NewOwnerId,
+	})
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return

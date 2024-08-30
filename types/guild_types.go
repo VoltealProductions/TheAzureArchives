@@ -9,7 +9,9 @@ type GuildStore interface {
 	GetGuildsByUserId(id int) ([]Guild, error)
 	CreateGuild(Guild) error
 	ConfirmThatGuildExists(slug string) (bool, error)
+	ConfirmThatUserOwnsGuild(slug string, id uint) (bool, error)
 	UpdateGuild(slug string, guild Guild) error
+	TransferGuild(slug string, id uint, guild Guild) error
 	DeleteGuild(slug string) error
 }
 
@@ -46,4 +48,9 @@ type UpdateGuildPayload struct {
 	Recruiting  bool      `json:"recruiting"`
 	Description string    `json:"description"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type TransferGuildPayload struct {
+	CurrentOwnerId uint `json:"current_owner_id" validate:"required"`
+	NewOwnerId     uint `json:"new_owner_id" validate:"required"`
 }

@@ -28,6 +28,19 @@ func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 	return false, nil
 }
 
+func (s *Store) ConfirmThatUserOwnsGuild(slug string, id uint) (bool, error) {
+	var nui sql.Null[string]
+	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ? AND owner_id = ?", slug, id).Scan(&nui)
+
+	fmt.Println(nui.Valid)
+
+	if nui.Valid {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (s *Store) GetGuildsByUserId(id int) ([]types.Guild, error) {
 	rows, err := s.db.Query("SELECT * FROM guilds WHERE owner_id = ?", id)
 	if err != nil {
@@ -119,6 +132,22 @@ func (s *Store) DeleteGuild(slug string) error {
 	_, err := s.db.Exec(
 		"DELETE FROM guilds WHERE slug = ?",
 		slug,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) TransferGuild(slug string, id uint, guild types.Guild) error {
+	if id == guild.OwnerId {
+		return fmt.Errorf("you can not transfer a guild to yourself")
+	}
+
+	_, err := s.db.Exec(
+		"UPDATE guilds SET owner_id = ? WHERE owner_id = ? AND slug = ?",
+		guild.OwnerId, id, slug,
 	)
 	if err != nil {
 		return err
