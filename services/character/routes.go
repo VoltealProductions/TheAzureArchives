@@ -28,7 +28,7 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 		r.HandleFunc("GET /character/show/{id}", h.HandleGetCharacter)
 		r.HandleFunc("GET /user/{id}/characters", h.HandleGetCharacterByUserId)
 		r.HandleFunc("PUT /character/update/{id}", h.handleUpdateCharacter)
-		r.HandleFunc("DELETE /character/delete/{id}", h.handleDeleteUser)
+		r.HandleFunc("DELETE /character/delete/{id}", h.handleDeleteCharacter)
 	})
 }
 
@@ -149,7 +149,7 @@ func (h *Handler) handleUpdateCharacter(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleDeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	charID := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(charID, 10, 64)
 	if err != nil {

@@ -8,8 +8,8 @@ type GuildStore interface {
 	GetGuildBySlug(slug string) (*Guild, error)
 	// GetGuildByUserId(id int) ([]Guild, error)
 	CreateGuild(Guild) error
-	// UpdateGuild(id int, user Guild) error
-	// DeleteCharacter(id int) error
+	UpdateGuild(slug string, guild Guild) error
+	DeleteGuild(slug string) error
 }
 
 type Guild struct {
@@ -18,7 +18,7 @@ type Guild struct {
 	Slug        string    `json:"slug"`
 	Name        string    `json:"name"`
 	Faction     string    `json:"faction"`
-	Realm       string    `json:"server"`
+	Realm       string    `json:"realm"`
 	Ranks       string    `json:"ranks"`
 	Recruiting  bool      `json:"recruiting"`
 	Description string    `json:"description"`
@@ -37,11 +37,10 @@ type CreateGuildPayload struct {
 }
 
 type UpdateGuildPayload struct {
-	OwnerId     uint      `json:"owner_id"`
 	Slug        string    `json:"slug"`
 	Name        string    `json:"name"`
 	Faction     string    `json:"faction"`
-	Realm       string    `json:"server"`
+	Realm       string    `json:"realm"`
 	Ranks       string    `json:"ranks"`
 	Recruiting  bool      `json:"recruiting"`
 	Description string    `json:"description"`

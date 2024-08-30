@@ -71,10 +71,23 @@ func (s *Store) CreateGuild(guild types.Guild) error {
 	return nil
 }
 
-func (s *Store) DeleteGuild(guildId int) error {
+func (s *Store) UpdateGuild(slug string, guild types.Guild) error {
+
 	_, err := s.db.Exec(
-		"DELETE FROM guilds WHERE id = ?",
-		guildId,
+		"UPDATE guilds SET slug = ?, name = ?, faction = ?, realm = ?, ranks = ?, recruiting = ?, description = ?, updated_at = ? WHERE slug = ?",
+		guild.Slug, guild.Name, guild.Faction, guild.Realm, guild.Ranks, guild.Recruiting, guild.Description, guild.UpdatedAt, slug,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Store) DeleteGuild(slug string) error {
+	_, err := s.db.Exec(
+		"DELETE FROM guilds WHERE slug = ?",
+		slug,
 	)
 	if err != nil {
 		return err
