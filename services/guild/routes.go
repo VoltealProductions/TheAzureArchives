@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/VoltealProductions/TheAzureArcchives/middleware"
@@ -26,6 +27,8 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 	router.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware)
 		r.HandleFunc("GET /guild/show/{slug}", h.handleGetGuild)
+		// r.HandleFunc("GET /guild/{slug}/members", h.handleGetGuild)
+		r.HandleFunc("GET /user/{id}/guilds", h.HandleGetCharacterByUserId)
 		r.HandleFunc("POST /guild/create", h.handleCreateGuild)
 		r.HandleFunc("POST /guild/{slug}/update", h.handleUpdatGuild)
 		r.HandleFunc("DELETE /guild/{slug}/delete", h.handleDeleteGuild)
@@ -36,6 +39,26 @@ func (h *Handler) handleGetGuild(w http.ResponseWriter, r *http.Request) {
 	slug := chi.URLParam(r, "slug")
 
 	c, err := h.store.GetGuildBySlug(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = utils.WriteJSON(w, http.StatusOK, c)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (h *Handler) HandleGetCharacterByUserId(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	uid, err := strconv.Atoi(id)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	c, err := h.store.GetGuildsByUserId(uid)
 	if err != nil {
 		utils.WriteError(w, http.StatusBadRequest, err)
 		return

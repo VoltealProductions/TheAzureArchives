@@ -28,6 +28,24 @@ func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 	return false, nil
 }
 
+func (s *Store) GetGuildsByUserId(id int) ([]types.Guild, error) {
+	rows, err := s.db.Query("SELECT * FROM guilds WHERE owner_id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+
+	guilds := []types.Guild{}
+	for rows.Next() {
+		guild, err := scanRowIntoGuild(rows)
+		guilds = append(guilds, *guild)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return guilds, nil
+}
+
 func (s *Store) GetGuildBySlug(slug string) (*types.Guild, error) {
 	rows, err := s.db.Query("SELECT * FROM guilds WHERE slug = ?", slug)
 	if err != nil {
