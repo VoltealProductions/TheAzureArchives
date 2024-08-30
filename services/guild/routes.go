@@ -27,7 +27,7 @@ func (h *Handler) RegisterRoutes(router *chi.Mux) {
 	router.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware)
 		r.HandleFunc("GET /guild/show/{slug}", h.handleGetGuild)
-		// r.HandleFunc("GET /guild/{slug}/members", h.handleGetGuild)
+		r.HandleFunc("GET /guild/{slug}/members", h.handleGetGuildMembers)
 		r.HandleFunc("GET /user/{id}/guilds", h.HandleGetCharacterByUserId)
 		r.HandleFunc("POST /guild/create", h.handleCreateGuild)
 		r.HandleFunc("PUT /guild/{slug}/update", h.handleUpdatGuild)
@@ -223,6 +223,34 @@ func (h *Handler) handleTransferGuildOwnerShip(w http.ResponseWriter, r *http.Re
 	}
 
 	err = utils.WriteJSON(w, http.StatusOK, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (h *Handler) handleGetGuildMembers(w http.ResponseWriter, r *http.Request) {
+	slug := chi.URLParam(r, "slug")
+
+	exists, err := h.store.ConfirmThatGuildExists(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if !exists {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("no guild with slug %s exists", slug))
+		return
+	}
+
+	// Get the Membership By Slug
+	members, err := h.store.GetAllGuildMembers(slug)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	//Return membership to endpoint
+	err = utils.WriteJSON(w, http.StatusOK, members)
 	if err != nil {
 		log.Fatal(err)
 	}

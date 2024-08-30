@@ -3,6 +3,7 @@ package guild
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/VoltealProductions/TheAzureArcchives/types"
 )
@@ -19,8 +20,6 @@ func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 	var nui sql.Null[string]
 	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ?", slug).Scan(&nui)
 
-	fmt.Println(nui.Valid)
-
 	if nui.Valid {
 		return true, nil
 	}
@@ -31,8 +30,6 @@ func (s *Store) ConfirmThatGuildExists(slug string) (bool, error) {
 func (s *Store) ConfirmThatUserOwnsGuild(slug string, id uint) (bool, error) {
 	var nui sql.Null[string]
 	s.db.QueryRow("SELECT id FROM guilds WHERE slug = ? AND owner_id = ?", slug, id).Scan(&nui)
-
-	fmt.Println(nui.Valid)
 
 	if nui.Valid {
 		return true, nil
@@ -156,10 +153,82 @@ func (s *Store) TransferGuild(slug string, id uint, guild types.Guild) error {
 	return nil
 }
 
-func (s *Store) GetAllGuildMembers(slug string) ([]types.GuildMember, error) {
-	return nil, nil
+func (s *Store) GetAllGuildMembers(slug string) ([]types.Character, error) {
+	rows, err := s.db.Query("SELECT * FROM guildmembers WHERE guild_slug = ?", slug)
+	if err != nil {
+		return nil, err
+	}
+
+	characters := []types.Character{}
+	for rows.Next() {
+		char := s.retrieveCharacters(rows)
+		characters = append(characters, *char)
+	}
+
+	return characters, nil
 }
 
-// func (s *Store) retrieveGuildMember(slug string, id uint, guild types.Guild) (types.GuildMember, error) {
-// 	return nil, nil
-// }
+func (s *Store) retrieveCharacters(rows *sql.Rows) *types.Character {
+	id := new(types.GuildMember)
+	err := rows.Scan(
+		&id.ID,
+		&id.GuildSlug,
+		&id.CharacterID,
+		&id.Rank,
+		&id.CreatedAt,
+		&id.UpdatedAt,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(id.CharacterID)
+
+	characterRows, err := s.db.Query("SELECT * FROM characters WHERE id = ?", id.CharacterID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	g := new(types.Character)
+	for characterRows.Next() {
+		g, err = scanRowIntoMember(characterRows)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	return g
+}
+
+func scanRowIntoMember(rows *sql.Rows) (*types.Character, error) {
+	c := new(types.Character)
+
+	err := rows.Scan(
+		&c.ID,
+		&c.UserID,
+		&c.UniqueId,
+		&c.Firstname,
+		&c.Lastname,
+		&c.Faction,
+		&c.Species,
+		&c.Class,
+		&c.ShortTitle,
+		&c.FullTitle,
+		&c.Age,
+		&c.Gender,
+		&c.Pronouns,
+		&c.Height,
+		&c.Weight,
+		&c.Birthplace,
+		&c.Residence,
+		&c.About,
+		&c.History,
+		&c.CreatedAt,
+		&c.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
