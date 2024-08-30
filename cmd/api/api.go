@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/VoltealProductions/TheAzureArcchives/services/character"
+	"github.com/VoltealProductions/TheAzureArcchives/services/guild"
 	"github.com/VoltealProductions/TheAzureArcchives/services/user"
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
@@ -39,6 +40,10 @@ func (s *APIServer) Run() error {
 	characterStore := character.NewStore(s.db)
 	characterHandler := character.NewHandler(characterStore)
 	characterHandler.RegisterRoutes(apiRouter)
+
+	guildStore := guild.NewStore(s.db)
+	guildHandler := guild.NewHandler(guildStore)
+	guildHandler.RegisterRoutes(apiRouter)
 
 	server := http.Server{
 		Addr:    s.addr,

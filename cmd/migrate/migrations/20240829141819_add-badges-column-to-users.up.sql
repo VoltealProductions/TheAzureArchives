@@ -1,0 +1,1 @@
+ALTER TABLE users ADD badges varchar(255) DEFAULT '';
