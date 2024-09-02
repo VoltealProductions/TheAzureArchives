@@ -7,7 +7,7 @@ COPY . .
 RUN go mod download
 
 # Build the API Application
-RUN go build -o ./archives ./cmd
+RUN go build -o ./archives ./cmd/main.go
 
 # Build the Migrator
 RUN go build -o ./migrator ./cmd/migrate
@@ -22,8 +22,9 @@ WORKDIR /app
 COPY --from=build /app/archives .
 COPY --from=build /app/migrator .
 COPY --from=build /app/migrations ./migrations
-COPY --from=build /app/.env .
 
 EXPOSE 3030
 
-CMD [ "/app/archives" ]
+RUN /app/migrator up
+
+ENTRYPOINT [ "/app/archives" ]

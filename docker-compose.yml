@@ -1,0 +1,37 @@
+networks:
+  archives:
+
+
+services:
+  server:
+    build: .
+    container_name: TheAzureArchives
+    depends_on:
+      - database
+    restart: unless-stopped
+    tty: true
+    networks:
+      - archives
+    environment:
+      JWT_SECRET: wM2lqLmRk0MepWt0q9SfNp8esq7sOnC8
+      JWT_EXPIRATION: 604800
+      DB_DRIVER: mysql
+      PUBLIC_HOST: database
+      PUBLIC_PORT: 3306
+      DB_NAME: thearchives
+      DB_USER: thearchivist
+      DB_PASS: Lbhn37sLa7idvk8h3hD7rr2nxgsXFV
+    ports:
+      - 3030:3030
+
+  database:
+    image: mysql
+    container_name: database
+    restart: always
+    networks:
+      - archives
+    environment:
+      MYSQL_DATABASE: thearchives
+      MYSQL_USER: thearchivist
+      MYSQL_PASSWORD: Lbhn37sLa7idvk8h3hD7rr2nxgsXFV
+      MYSQL_ROOT_PASSWORD: example

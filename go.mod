@@ -11,6 +11,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/gosimple/slug v1.14.0
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/sqids/sqids-go v0.4.1
 	golang.org/x/crypto v0.20.0
 )

@@ -12,6 +12,7 @@ import (
 type Config struct {
 	PublicHost  string
 	Port        string
+	DBDriver    string
 	DBUser      string
 	DBPassword  string
 	DBAddress   string
@@ -31,6 +32,7 @@ func initConfig() Config {
 	return Config{
 		PublicHost:  getEnv("PUBLIC_HOST", "localhost"),
 		Port:        getEnv("PUBLIC_PORT", "3030"),
+		DBDriver:    getEnv("DB_DRIVER", "sqlite3"),
 		DBUser:      getEnv("DB_USER", "root"),
 		DBPassword:  getEnv("DB_PASS", "password"),
 		DBAddress:   fmt.Sprintf("%s:%s", getEnv("PUBLIC_HOST", "localhost"), getEnv("PUBLIC_PORT", "3030")),

@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	db, err := db.NewMySqlStorage(mysql.Config{
+	db, err := db.NewMySqlStorage(config.Envs.DBDriver, mysql.Config{
 		User:                 config.Envs.DBUser,
 		Passwd:               config.Envs.DBPassword,
 		Addr:                 config.Envs.DBAddress,

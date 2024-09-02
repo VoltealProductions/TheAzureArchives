@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS guilds (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `owner_id` INT NOT NULL,
+    `slug` VARCHAR(255) UNIQUE NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `faction` VARCHAR(255) NOT NULL,
+    `realm` VARCHAR(255) NOT NULL,
+    `ranks` VARCHAR(255) default '',
+    `recruiting` BOOLEAN NOT NULL DEFAULT false,
+    `description` TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
