@@ -1,14 +1,8 @@
 build:
 	go build -o bin/archives ./cmd/main.go
 
-api-run: build
+run: build
 	./bin/archives
-
-client-build:
-	go build -o bin/client ./cmd/client/main.go
-
-client-run: client-build
-	./bin/client
 
 test:
 	go test -v ./... -count=1
@@ -24,3 +18,9 @@ migrate-up:
 
 migrate-down:
 	go run cmd/migrate/main.go down
+
+watch:
+	@clear && tailwindcss -i ./public/css/input.css -o ./public/css/style.css --watch
+
+minify:
+	@tailwindcss -i ./public/css/input.css -o ./public/css/style.min.css --minify

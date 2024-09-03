@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-base: #ffffff;
+    --colot-muted: #767A7C;
+    --color-dark: #000000;
+    --color-theme: #4169E1;
+    --color-theme-dark: hsl(225, 67%, 48%);
+    --color-accent: #288971;
+    --color-accent-light: #B0DEE4;
+    --color-parchment: #FCF5E5;
+  }
+
+  .font-outline {
+    -webkit-text-stroke: 0.75px #B0DEE4;
+  }
+}

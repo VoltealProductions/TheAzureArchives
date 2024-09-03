@@ -1,4 +1,4 @@
-package api
+package server
 
 import (
 	"database/sql"
@@ -12,21 +12,21 @@ import (
 	chimw "github.com/go-chi/chi/v5/middleware"
 )
 
-type APIServer struct {
+type Server struct {
 	addr string
 	db   *sql.DB
 }
 
 type Middleware func(next http.Handler) http.HandlerFunc
 
-func NewApiServer(addr string, db *sql.DB) *APIServer {
-	return &APIServer{
+func NewServer(addr string, db *sql.DB) *Server {
+	return &Server{
 		addr: addr,
 		db:   db,
 	}
 }
 
-func (s *APIServer) Run() error {
+func (s *Server) Run() error {
 	router := chi.NewRouter()
 	router.Use(chimw.Logger)
 
@@ -44,6 +44,13 @@ func (s *APIServer) Run() error {
 	guildStore := guild.NewStore(s.db)
 	guildHandler := guild.NewHandler(guildStore)
 	guildHandler.RegisterRoutes(apiRouter)
+
+	// Serve static files
+	fs := http.FileServer(http.Dir("./public"))
+	router.Handle("/public/*", http.StripPrefix("/public/", fs))
+
+	//Web Pages
+	router.Mount("/", RegisterBaseRoutes(router))
 
 	server := http.Server{
 		Addr:    s.addr,
