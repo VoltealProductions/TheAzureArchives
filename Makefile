@@ -1,11 +1,14 @@
 build:
-	go build -o bin/app ./cmd/main.go
+	go build -o bin/archives ./cmd/main.go
 
-build-pi:
-	env GOOS=linux GOARCH=arm go build -o ./bin/pi-app ./cmd/main.go
+api-run: build
+	./bin/archives
 
-run: build
-	./bin/app
+client-build:
+	go build -o bin/client ./cmd/client/main.go
+
+client-run: client-build
+	./bin/client
 
 test:
 	go test -v ./... -count=1
