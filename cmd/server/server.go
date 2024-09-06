@@ -45,13 +45,6 @@ func (s *Server) Run() error {
 	guildHandler := guild.NewHandler(guildStore)
 	guildHandler.RegisterRoutes(apiRouter)
 
-	// Serve static files
-	fs := http.FileServer(http.Dir("./public"))
-	router.Handle("/public/*", http.StripPrefix("/public/", fs))
-
-	//Web Pages
-	router.Mount("/", RegisterBaseRoutes(router))
-
 	server := http.Server{
 		Addr:    s.addr,
 		Handler: router,
